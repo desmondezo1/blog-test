@@ -1,6 +1,9 @@
 <?php
 
+
 namespace App\Traits;
+
+use Illuminate\Support\Facades\Log;
 
 trait ApiResponses {
 
@@ -16,7 +19,10 @@ trait ApiResponses {
         ], $statusCode);
     }
 
-    protected function error($message, $statusCode) {
+    protected function error($message, $statusCode, $reason = "") {
+
+        Log::error("Unexpected error while {$message}: " . $reason);
+
         return response()->json([
             "message" => $message,
             "status" => $statusCode,
