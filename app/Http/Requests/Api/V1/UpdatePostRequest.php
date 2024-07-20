@@ -22,7 +22,27 @@ class UpdatePostRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'title' => 'sometimes|required|string|max:255',
+            'content' => 'sometimes|required|string',
+            'author' => 'sometimes|required|string|max:255',
+            'status' => 'sometimes|in:draft,published,scheduled',
+            'scheduled_for' => 'sometimes|date|after:now',
+        ];
+    }
+
+    /**
+     * Get custom messages for validator errors.
+     *
+     * @return array
+     */
+    public function messages()
+    {
+        return [
+            'title.required' => 'Title is required.',
+            'content.required' => 'Content is required.',
+            'author.required' => 'An author is required.',
+            'status.in' => 'The status must either be of draft, published, or scheduled.',
+            'scheduled_for.after' => 'The scheduled time must be in the future.',
         ];
     }
 }
