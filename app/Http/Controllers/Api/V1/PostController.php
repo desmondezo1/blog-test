@@ -26,8 +26,50 @@ use Illuminate\Support\Str;
 class PostController extends Controller
 {
     use ApiResponses;
+
     /**
-     * Display a listing of the resource.
+     * @OA\GET(
+     *     path="/api/v1/posts",
+     *     tags={"Posts"},
+     *     summary="Fetch all Posts",
+     *     description="Fetch all published posts for non-admins 
+     *          and All post types for admins",
+     * 
+     *  @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         description="Page number for pagination",
+     *         required=false,
+     *         @OA\Schema(type="integer", default=1)
+     *     ),
+     *     @OA\Parameter(
+     *         name="per_page",
+     *         in="query",
+     *         description="Number of items per page",
+     *         required=false,
+     *         @OA\Schema(type="integer", default=15)
+     *     ),
+     *      @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="integer", example=200),
+     *             @OA\Property(property="message", type="string", example="Posts retrieved successfully"),
+     *             @OA\Property(property="data", type="object", example="{...}"),
+     *          @OA\Property(
+     *                     property="pagination",
+     *                     type="object",
+     *                     @OA\Property(property="total", type="integer", example=50),
+     *                     @OA\Property(property="per_page", type="integer", example=15),
+     *                     @OA\Property(property="current_page", type="integer", example=1),
+     *                     @OA\Property(property="last_page", type="integer", example=4)
+     *                 )
+     *          )
+     *      )
+     * )
+     * 
+     * 
+     *   Fetch all posts
      */
     public function index(Request $request): JsonResponse
     {
