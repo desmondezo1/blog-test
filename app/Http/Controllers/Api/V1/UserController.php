@@ -12,6 +12,7 @@ use App\Traits\ApiResponses;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use App\Filters\V1\UserFilter;
+use Illuminate\Support\Facades\Hash;
 
 
 class UserController extends Controller
@@ -60,17 +61,50 @@ class UserController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreUserRequest $request)
+    public function store(StoreUserRequest $request): JsonResponse
     {
-        //
+        try {
+            
+            $validated = $request->validated();
+     
+            $user = User::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'password' => Hash::make($request->password),
+                'role' => $request->role ?? 'user',
+                'status' => $request->status ?? 'active',
+            ]);
+
+            // Create a token for the user
+            $token = $user->createToken('auth_token')->plainTextToken;
+
+
+            return $this->success(
+                'User registered successfully',
+                [
+                    'user' => new UserResource($user),
+                    'access_token' => $token,
+                    'token_type' => 'Bearer',
+                ],
+                Response::HTTP_CREATED
+            );
+
+        } catch (\Exception $e) {
+            return $this->error(
+                'An error occurred while registering the user ',
+                Response::HTTP_INTERNAL_SERVER_ERROR,
+                $e->getMessage()
+            );
+        }
+    
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(User $user)
+    public function show(int $id)
     {
-        //
+        return $this->ok('Yes', $id);
     }
 
 

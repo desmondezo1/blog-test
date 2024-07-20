@@ -3,6 +3,9 @@
 namespace App\Http\Requests\Api\V1;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class UpdatePostRequest extends FormRequest
 {
@@ -42,5 +45,17 @@ class UpdatePostRequest extends FormRequest
             'author.required' => 'An author is required.',
             'status.in' => 'The status must either be of draft, published, or scheduled.',
         ];
+    }
+
+
+    protected function failedValidation(Validator $validator)
+    {
+        throw new HttpResponseException(
+            response()->json([
+                'message' => 'Validation errors',
+                'data' => $validator->errors(),
+                'status' => JsonResponse::HTTP_UNPROCESSABLE_ENTITY
+            ], JsonResponse::HTTP_UNPROCESSABLE_ENTITY)
+        );
     }
 }

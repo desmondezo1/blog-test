@@ -3,6 +3,9 @@
 namespace App\Http\Requests\Api;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class SchedulePostRequest extends FormRequest
 {
@@ -24,5 +27,16 @@ class SchedulePostRequest extends FormRequest
         return [
             'scheduled_for' => 'required|date|after:now',
         ];
+    }
+
+    protected function failedValidation(Validator $validator)
+    {
+        throw new HttpResponseException(
+            response()->json([
+                'message' => 'Validation errors',
+                'data' => $validator->errors(),
+                'status' => JsonResponse::HTTP_UNPROCESSABLE_ENTITY
+            ], JsonResponse::HTTP_UNPROCESSABLE_ENTITY)
+        );
     }
 }

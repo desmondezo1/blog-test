@@ -3,6 +3,9 @@
 namespace App\Http\Requests\Api;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class LoginUserRequest extends FormRequest
 {
@@ -43,6 +46,16 @@ class LoginUserRequest extends FormRequest
             'password.min' => 'The password must be at least 8 characters.',
         ];
     }
-
+    
+    protected function failedValidation(Validator $validator)
+    {
+        throw new HttpResponseException(
+            response()->json([
+                'message' => 'Validation errors',
+                'data' => $validator->errors(),
+                'status' => JsonResponse::HTTP_UNPROCESSABLE_ENTITY
+            ], JsonResponse::HTTP_UNPROCESSABLE_ENTITY)
+        );
+    }
 
 }
