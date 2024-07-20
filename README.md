@@ -145,3 +145,49 @@ The API Documentation was done using OpenAPI (Swagger)
 
        
 ```
+
+
+## DO YOU PREFER TO USE DOCKER?
+
+Here's how to run this project using Docker
+
+### Prerequisites
+
+### 1. You Obviously need to have docker installed on your computer
+
+[Install Docker](https://docs.docker.com/engine/install/)
+### 2. Build the Containers: 
+ You will need to run:
+
+```
+docker-compose up -d --build
+```
+
+### 3. Install Laravel Dependencies
+
+```
+docker-compose exec app composer install
+```
+
+### 4. Copy the .env.example File to .env
+```
+cp .env.example .env
+```
+
+### 5. Generate Application Key
+
+```
+docker-compose exec app php artisan key:generate
+```
+
+### 6. Run Database Migrations
+
+```
+docker-compose exec app php artisan migrate
+```
+
+### 7. Run Database seed
+
+```
+docker-compose exec app php artisan db:seed
+```
