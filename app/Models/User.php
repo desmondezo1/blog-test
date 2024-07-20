@@ -35,7 +35,7 @@ class User extends Authenticatable
     ];
 
     public function isAdministrator() {
-        return $this->where('role', 'admin')->exists();
+        return $this->role === 'admin';
      }
 
     public function posts()

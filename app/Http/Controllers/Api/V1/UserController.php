@@ -13,6 +13,10 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use App\Filters\V1\UserFilter;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Auth;
+
+
 
 
 class UserController extends Controller
@@ -32,7 +36,10 @@ class UserController extends Controller
             $usersQuery = User::query();
             $filter = new UserFilter($request);
 
-            $usersQuery = $filter->apply($usersQuery, $request->user()->isAdministrator());
+            $usersQuery = $filter->apply(
+                $usersQuery, 
+                $request->user()->isAdministrator()
+            );
 
             $users = $usersQuery->paginate($perPage, ['*'], 'page', $page);
 
@@ -66,13 +73,13 @@ class UserController extends Controller
         try {
             
             $validated = $request->validated();
-     
+
             $user = User::create([
                 'name' => $validated['name'],
                 'email' => $validated['email'],
                 'password' => Hash::make($request->password),
-                'role' => $request->role ?? 'user',
-                'status' => $request->status ?? 'active',
+                'role' => 'reader',
+                'is_active' => $request->status ?? 1,
             ]);
 
             // Create a token for the user
@@ -112,16 +119,74 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateUserRequest $request, User $user)
+    public function update(UpdateUserRequest $request, int $id): JsonResponse
     {
-        //
+        try {
+
+            $user = User::findOrFail($id);
+            Gate::authorize('update', $user);
+
+            $validated = $request->validated();
+
+            $validated['email'] = $request->user()->isAdministrator() ? $validated['email']: $user->email;
+            $validated['role'] = $request->user()->isAdministrator() ? $validated['role']:'reader';
+
+            if (isset($validated['password'])) {
+                $validated['password'] = Hash::make($validated['password']);
+            }
+
+            $user->update($validated);
+            $userResource = new UserResource($user);
+
+            return $this->ok('User updated', $userResource);
+
+        } catch (ModelNotFoundException $e) {
+
+            return $this->error(
+                'User not found', 
+                Response::HTTP_NOT_FOUND,
+                $e->getMessage()
+            );
+
+        } catch (\Exception $e) {
+            
+            return $this->error(
+                'An error occurred while updating the user.', 
+                Response::HTTP_INTERNAL_SERVER_ERROR,
+                $e->getMessage()
+            );
+        }
     }
 
     /**
-     * Remove the specified resource from storage.
+     *  Delete a user
      */
-    public function destroy(User $user)
+    public function destroy(int $id)
     {
-        //
+        try {
+            $user = User::findOrFail($id);
+            Gate::authorize('delete', $user);
+
+            $user->delete();
+
+            return $this->success(
+                'User deleted!', 
+                null,
+                Response::HTTP_NO_CONTENT
+            );
+
+        } catch (ModelNotFoundException $e) {
+            return $this->error(
+                'User not found.', 
+                Response::HTTP_NOT_FOUND,
+                $e->getMessage()
+            );
+        } catch (\Exception $e) {
+            return $this->error(
+                'An error occurred while deleting the user.: '.$e->getMessage(), 
+                Response::HTTP_INTERNAL_SERVER_ERROR,
+                $e->getMessage()
+            );
+        }
     }
 }
