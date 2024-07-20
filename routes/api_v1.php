@@ -8,25 +8,35 @@ use App\Http\Controllers\Api\V1\UserController;
 
 Route::apiResource('users', UserController::class);
 
-// Post routes
+
+/**
+ *   Public Post Routes 
+ */
 Route::prefix('posts')->group(function () {
-    Route::get('/', [PostController::class, 'index']);
-    Route::post('/', [PostController::class, 'store'])->middleware(['auth:sanctum']);
-    
+    Route::get('/', [PostController::class, 'index']);    
     Route::get('/search', [PostController::class, 'search']);
-    Route::get('/author/{userId}', [PostController::class, 'getByAuthor']);
-    Route::get('/status/{status}', [PostController::class, 'getByStatus'])->middleware('admin');
-    
+    Route::get('/author/{userId}', [PostController::class, 'getByAuthor']);    
     Route::get('/{id}/comments', [PostController::class, 'getComments']);
     Route::get('/{id}/tags', [PostController::class, 'getTags']);
-    Route::post('/{id}/publish', [PostController::class, 'publish'])->middleware(['auth:sanctum']);
-    Route::post('/{id}/unpublish', [PostController::class, 'unpublish'])->middleware(['auth:sanctum']);
-    Route::post('/{id}/schedule', [PostController::class, 'schedule'])->middleware(['auth:sanctum']);
-    
     Route::get('/{id}', [PostController::class, 'show']);
-    Route::put('/{id}', [PostController::class, 'update'])->middleware(['auth:sanctum']);
-    Route::delete('/{id}', [PostController::class, 'destroy'])->middleware(['auth:sanctum']);
 });
+
+/**
+ *   Routes for the admin dashboard
+ */
+Route::prefix('admin')->middleware(['auth:sanctum'])->group(function () {
+    Route::prefix('posts')->group(function () {
+        Route::get('/', [PostController::class, 'index']);
+        Route::post('/', [PostController::class, 'store']);
+        Route::get('/status/{status}', [PostController::class, 'getByStatus']);
+        Route::post('/{id}/publish', [PostController::class, 'publish']);
+        Route::post('/{id}/unpublish', [PostController::class, 'unpublish']);
+        Route::post('/{id}/schedule', [PostController::class, 'schedule']);
+        Route::put('/{id}', [PostController::class, 'update']);
+        Route::delete('/{id}', [PostController::class, 'destroy']);
+    });
+});
+
 
 
 

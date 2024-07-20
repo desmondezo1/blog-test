@@ -35,15 +35,32 @@ class PostController extends Controller
             $perPage = $request->input('per_page', 15);
             $page = $request->input('page', 1);
 
-            $posts = Post::query()
-                ->with('user')
-                ->when($request->has('status'), function ($query) use ($request) {
-                    return $query->where('status', $request->status);
-                })
-                ->when($request->has('sort_by'), function ($query) use ($request) {
-                    return $query->orderBy($request->sort_by, $request->order ?? 'asc');
-                })
-                ->paginate($perPage, ['*'], 'page', $page);
+            // Check if user is logged in and is an admin
+            $isAdmin = $request->user() && $request->user()->isAdministrator();
+
+            // setup the query
+            $postsQuery = Post::query()->with('user');
+
+            // Non admins should only get published posts
+            if ($isAdmin) {
+                if ($request->has('status')) {
+                    $postsQuery->where('status', $request->status);
+                }
+            } elseif (!$isAdmin) {
+                $postsQuery->where('status', 'published');
+            }
+            
+            // Sort the results
+            $postsQuery->when($request->has('sort_by'), function ($query) use ($request) {
+                return $query->orderBy(
+                    $request->sort_by,
+                    $request->order ?? 'asc'
+                );
+            }, function ($query) {
+                return $query->latest('published_at');
+            });
+
+            $posts = $postsQuery->paginate($perPage, ['*'], 'page', $page);
 
             return $this->ok("Posts fetched successfully", PostResource::collection($posts));
 
@@ -138,7 +155,7 @@ class PostController extends Controller
     public function store(StorePostRequest $request): JsonResponse
     {
         try {
-            $user = Auth::user();
+            $user = $request->user();
 
             $validated = $request->validated();
 
