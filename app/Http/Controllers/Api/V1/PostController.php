@@ -12,17 +12,15 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Http\JsonResponse;
-
-
-
-
-
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use App\Traits\ApiResponses;
 use App\Http\Requests\Api\V1\StorePostRequest;
+use App\Http\Requests\Api\V1\SchedulePostRequest;
+use App\Http\Requests\Api\V1\UpdatePostRequest;
 use Illuminate\Support\Facades\Gate;
-// use App\Http\Requests\Api\V1\UpdatePostRequest;
-// use App\Models\Post;
+use Illuminate\Support\Str;
+
 
 class PostController extends Controller
 {
@@ -37,6 +35,7 @@ class PostController extends Controller
             $page = $request->input('page', 1);
 
             $posts = Post::query()
+                ->with('user')
                 ->when($request->has('status'), function ($query) use ($request) {
                     return $query->where('status', $request->status);
                 })
@@ -45,7 +44,7 @@ class PostController extends Controller
                 })
                 ->paginate($perPage, ['*'], 'page', $page);
 
-            return $this->ok('Posts fetched Successfully',$posts);
+            return $this->ok("Posts fetched successfully", PostResource::collection($posts));
 
         } catch (QueryException $e) {
 
@@ -66,18 +65,92 @@ class PostController extends Controller
         }
     }
 
+    /**
+     *   Search for posts
+     */
+    public function search(Request $request): JsonResponse
+    {
+        try {
+            $query = $request->get('query');
+            Post::with('user')
+                ->where(function ($queryBuilder) use ($query) {
+                    $queryBuilder->where('title', 'like', "%{$query}%")
+                ->orWhere('content', 'like', "%{$query}%");
+                    })
+                ->paginate(15);
+
+            return $this->ok(
+                "Posts fetched successfully", 
+                PostResource::collection($posts)
+            );
+    
+        } catch (\Exception $e) {
+            return $this->error(
+                'An error occurred while searching posts', 
+                Response::HTTP_INTERNAL_SERVER_ERROR, 
+                $e->getMessage());
+        }
+    }
 
     /**
-     * Store a newly created resource in storage.
+     *   Get posts by Post Author
+     */
+    public function getByAuthor(int $userId): JsonResponse
+    {
+        try {
+            $user = User::findOrFail($userId);
+            $posts = $user->posts()->paginate(15);
+
+            return $this->ok(
+                "Posts fetched successfully", 
+                PostResource::collection($posts)
+            );
+        
+        } catch (ModelNotFoundException $e) {
+            return $this->error(
+                'User not found.', 
+                Response::HTTP_NOT_FOUND, 
+                $e->getMessage()
+            );
+        } catch (\Exception $e) {
+            
+            return $this->error(
+                'An error occurred while retrieving posts.', 
+                Response::HTTP_INTERNAL_SERVER_ERROR, 
+                $e->getMessage()
+            );
+        }
+    }
+
+
+    /**
+     *  Create a new post [Requires API token]
      */
     public function store(StorePostRequest $request): JsonResponse
     {
         try {
-            $post = Post::create($request->validated());
+            $user = Auth::user();
 
+            $validated = $request->validated();
+
+            $slug = Str::slug($request->title);   //  Create a slug with helper
+
+            $count = Post::where('slug', 'LIKE', "{$slug}%")->count();  
+            if ($count > 0) {
+                $slug .= '-' . ($count + 1);
+            }
+
+            $validated['user_id'] = $user->id;
+            $validated['slug'] = $slug;
+            $validated['author'] = $user->name;
+
+            $post = Post::create($validated);
+            $postResource = new PostResource($post);
+            
             return $this->success(
                 'Post created Successfuly',
-                $post,Response::HTTP_CREATED 
+                $postResource,
+                Response::HTTP_CREATED 
             );
         } catch (QueryException $e) {
             return $this->error(
@@ -96,13 +169,15 @@ class PostController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     *  Fetch a post.
      */
     public function show(int $id): JsonResponse
     {
         try {
             $post = Post::findOrFail($id);
-            return $this->ok('Post found', $post);
+            $postResource = new PostResource($post);
+
+            return $this->ok('Post fetched', $postResource);
         } catch (ModelNotFoundException $e) {
             return $this->error(
                 'Post not found.', 
@@ -110,23 +185,27 @@ class PostController extends Controller
             );
         } catch (\Exception $e) {
             return $this->error(
-                'An error occurred trying to retrieving the post.', 
+                'An error occurred trying to retrieve the post.', 
                 Response::HTTP_INTERNAL_SERVER_ERROR
             );
         }
     }
 
     /**
-     * Update the specified resource in storage.
+     *  Update existing post [Requires API token].
      */
-    public function update(UpdatePostRequest $request,  int $id): JsonResponse
+    public function update(
+        UpdatePostRequest $request, 
+        int $id): JsonResponse
     {
         try {
             $post = Post::findOrFail($id);
-            Gate::authorize('update', $post); // To check if User can update a post
-            $post->update($request->validated());
 
-            return $this->ok('Post Updated Successfully', $post );
+            Gate::authorize('update', $post); // Verify this user can update a post
+
+            $post->update($request->validated());
+            $postResource = new PostResource($post);
+            return $this->ok('Post Updated Successfully', $postResource );
 
         } catch (ModelNotFoundException $e) {
             return $this->error(
@@ -135,7 +214,7 @@ class PostController extends Controller
             );
         } catch (\Exception $e) {
             return $this->error(
-                'updating the post', 
+                'Error updating the post', 
                 Response::HTTP_INTERNAL_SERVER_ERROR, 
                 $e->getMessage()
             );
@@ -143,13 +222,13 @@ class PostController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     *  Remove a post [Requires API token].
      */
     public function destroy(int $id): JsonResponse
     {
         try {
             $post = Post::findOrFail($id);
-            Gate::authorize('delete', $post);
+            Gate::authorize('delete', $post); // Verify this user can delete a post
             $post->delete();
             return $this->success('Post deleted successfully', '',  Response::HTTP_NO_CONTENT);
         } catch (ModelNotFoundException $e) {
@@ -167,7 +246,9 @@ class PostController extends Controller
         }
     }
 
-
+    /**
+     *  Fetch all comments for a post.
+     */
     public function getComments(int $id): JsonResponse
     {
         try {
@@ -183,6 +264,98 @@ class PostController extends Controller
         } catch (\Exception $e) {
             return $this->error(
                 'retrieving comments', 
+                Response::HTTP_INTERNAL_SERVER_ERROR, 
+                $e->getMessage()
+            );
+        }
+    }
+
+    /**
+     *  Method to schedule posts in draft
+     */
+    public function schedule(
+        SchedulePostRequest $request, 
+        int $id): JsonResponse
+    {
+        try {
+            $post = Post::findOrFail($id);
+            Gate::authorize('update', $post);  // Verify this user can update a post
+            
+            $post->update([
+                'status' => 'scheduled',
+                'published_at' => $request->scheduled_for,
+            ]);
+            $postResource = new PostResource($post);
+            return $this->ok('Post Scheduled', $postResource);
+            
+        } catch (ModelNotFoundException $e) {
+            return $this->error(
+                'Post not found.', 
+                Response::HTTP_NOT_FOUND, 
+                $e->getMessage()
+            );
+        } catch (\Exception $e) {
+            return $this->error(
+                'scheduling the post',
+                Response::HTTP_INTERNAL_SERVER_ERROR, 
+                $e->getMessage()
+            );
+        }
+    }
+
+    /**
+     *   Unpublish a post
+     */
+    public function unpublish(int $id): JsonResponse
+    {
+        try {
+            $post = Post::findOrFail($id);
+            Gate::authorize('update', $post); // Verify this user can update a post
+
+            $post->update([
+                'status' => 'draft',
+                'published_at' => null,
+            ]);
+            $postResource = new PostResource($post);
+            return $this->ok('Post Unpublished', $postResource);
+
+        } catch (ModelNotFoundException $e) {
+            return $this->error(
+                'Post not found.', 
+                Response::HTTP_NOT_FOUND, 
+                $e->getMessage()
+            );
+        } catch (\Exception $e) {
+            return $this->error(
+                'Error occured unpublishing the post ', 
+                Response::HTTP_INTERNAL_SERVER_ERROR, 
+                $e->getMessage()
+            );
+        }
+    }
+
+    /**
+     *   Publish a post
+     */
+    public function publish(int $id): JsonResponse
+    {
+        try {
+            $post = Post::findOrFail($id);
+            Gate::authorize('update', $post); // Verify this user can update a post
+            $post->update(['status' => 'published', 'published_at' => now()]);
+
+            $postResource = new PostResource($post);
+            return $this->ok('Post Published!', $postResource);
+            
+        } catch (ModelNotFoundException $e) {
+            return $this->error(
+                'Post not found.', 
+                Response::HTTP_NOT_FOUND, 
+                $e->getMessage()
+            );
+        } catch (\Exception $e) {
+            return $this->error(
+                'Error occured publishing the post ', 
                 Response::HTTP_INTERNAL_SERVER_ERROR, 
                 $e->getMessage()
             );
