@@ -19,9 +19,7 @@ Route::prefix('posts')->group(function () {
 });
 
 // Public User Routes
-Route::apiResource('users', UserController::class)->only(['show']);
- 
-
+Route::apiResource('users', UserController::class)->only(['show', 'store']);
 
 // Protected Routes [Requires token]
 Route::middleware(['auth:sanctum'])->group(function () {
@@ -43,7 +41,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
              Route::delete('/{id}', [PostController::class, 'destroy']);
          });
  
-         // Admin User Routes
+         // Admin User Routes 
          Route::apiResource('users', UserController::class)->only(['index']);
          Route::apiResource('users', UserController::class)->except(['show', 'update']);
      });
