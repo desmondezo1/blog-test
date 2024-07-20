@@ -1,9 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
 use App\Models\User;
-
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -18,6 +19,11 @@ class UserFactory extends Factory
      */
     protected static ?string $password;
 
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
     protected $model = User::class;
 
     /**
@@ -28,7 +34,6 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-
             'name' => $this->faker->name,
             'email' => $this->faker->unique()->safeEmail,
             'password' => static::$password ??= Hash::make('password'),
@@ -38,6 +43,4 @@ class UserFactory extends Factory
             'last_login_at' => $this->faker->dateTimeThisYear(),
         ];
     }
-
-    
 }

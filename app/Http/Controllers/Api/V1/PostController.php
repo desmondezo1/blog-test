@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V1;
 
-
 use App\Models\Post;
 use App\Models\User;
 use App\Http\Resources\PostResource;
@@ -21,7 +20,6 @@ use App\Http\Requests\Api\V1\SchedulePostRequest;
 use App\Http\Requests\Api\V1\UpdatePostRequest;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
-
 
 class PostController extends Controller
 {
@@ -105,23 +103,18 @@ class PostController extends Controller
             $posts = $postsQuery->paginate($perPage, ['*'], 'page', $page);
 
             return $this->ok("Posts fetched successfully", PostResource::collection($posts));
-
         } catch (QueryException $e) {
-
             return $this->error(
-                'An error occurred while retrieving posts', 
-                Response::HTTP_INTERNAL_SERVER_ERROR, 
+                'An error occurred while retrieving posts',
+                Response::HTTP_INTERNAL_SERVER_ERROR,
                 $e->getMessage()
             );
-
         } catch (\Exception $e) {
-
             return $this->error(
-                'An unexpected error has occurred.', 
-                Response::HTTP_INTERNAL_SERVER_ERROR, 
+                'An unexpected error has occurred.',
+                Response::HTTP_INTERNAL_SERVER_ERROR,
                 $e->getMessage()
             );
-
         }
     }
 
@@ -135,20 +128,20 @@ class PostController extends Controller
             Post::with('user')
                 ->where(function ($queryBuilder) use ($query) {
                     $queryBuilder->where('title', 'like', "%{$query}%")
-                ->orWhere('content', 'like', "%{$query}%");
-                    })
+                        ->orWhere('content', 'like', "%{$query}%");
+                })
                 ->paginate(15);
 
             return $this->ok(
-                "Posts fetched successfully", 
+                "Posts fetched successfully",
                 PostResource::collection($posts)
             );
-    
         } catch (\Exception $e) {
             return $this->error(
-                'An error occurred while searching posts', 
-                Response::HTTP_INTERNAL_SERVER_ERROR, 
-                $e->getMessage());
+                'An error occurred while searching posts',
+                Response::HTTP_INTERNAL_SERVER_ERROR,
+                $e->getMessage()
+            );
         }
     }
 
@@ -170,26 +163,23 @@ class PostController extends Controller
             $posts = $postsQuery->paginate(15);
 
             return $this->ok(
-                "Posts fetched successfully", 
+                "Posts fetched successfully",
                 PostResource::collection($posts)
             );
-        
         } catch (ModelNotFoundException $e) {
             return $this->error(
-                'User not found.', 
-                Response::HTTP_NOT_FOUND, 
+                'User not found.',
+                Response::HTTP_NOT_FOUND,
                 $e->getMessage()
             );
         } catch (\Exception $e) {
-            
             return $this->error(
-                'An error occurred while retrieving posts.', 
-                Response::HTTP_INTERNAL_SERVER_ERROR, 
+                'An error occurred while retrieving posts.',
+                Response::HTTP_INTERNAL_SERVER_ERROR,
                 $e->getMessage()
             );
         }
     }
-
 
     /**
      *  Create a new post [Requires API token]
@@ -203,7 +193,7 @@ class PostController extends Controller
 
             $slug = Str::slug($request->title);   //  Create a slug with helper
 
-            $count = Post::where('slug', 'LIKE', "{$slug}%")->count();  
+            $count = Post::where('slug', 'LIKE', "{$slug}%")->count();
             if ($count > 0) {
                 $slug .= '-' . ($count + 1);
             }
@@ -218,21 +208,20 @@ class PostController extends Controller
             return $this->success(
                 'Post created Successfuly',
                 $postResource,
-                Response::HTTP_CREATED 
+                Response::HTTP_CREATED
             );
         } catch (QueryException $e) {
             return $this->error(
-                'An error occured creating post', 
-                Response::HTTP_INTERNAL_SERVER_ERROR, 
+                'An error occured creating post',
+                Response::HTTP_INTERNAL_SERVER_ERROR,
                 $e->getMessage()
             );
         } catch (\Exception $e) {
             return $this->error(
-                'An error occured creating post', 
-                Response::HTTP_INTERNAL_SERVER_ERROR, 
+                'An error occured creating post',
+                Response::HTTP_INTERNAL_SERVER_ERROR,
                 $e->getMessage()
             );
-           
         }
     }
 
@@ -248,12 +237,12 @@ class PostController extends Controller
             return $this->ok('Post fetched', $postResource);
         } catch (ModelNotFoundException $e) {
             return $this->error(
-                'Post not found.', 
+                'Post not found.',
                 Response::HTTP_NOT_FOUND
             );
         } catch (\Exception $e) {
             return $this->error(
-                'An error occurred trying to retrieve the post.', 
+                'An error occurred trying to retrieve the post.',
                 Response::HTTP_INTERNAL_SERVER_ERROR
             );
         }
@@ -263,9 +252,9 @@ class PostController extends Controller
      *  Update existing post [Requires API token].
      */
     public function update(
-        UpdatePostRequest $request, 
-        int $id): JsonResponse
-    {
+        UpdatePostRequest $request,
+        int $id
+    ): JsonResponse {
         try {
             $post = Post::findOrFail($id);
 
@@ -273,17 +262,16 @@ class PostController extends Controller
 
             $post->update($request->validated());
             $postResource = new PostResource($post);
-            return $this->ok('Post Updated Successfully', $postResource );
-
+            return $this->ok('Post Updated Successfully', $postResource);
         } catch (ModelNotFoundException $e) {
             return $this->error(
-                'Post not found.', 
+                'Post not found.',
                 Response::HTTP_NOT_FOUND
             );
         } catch (\Exception $e) {
             return $this->error(
-                'Error updating the post', 
-                Response::HTTP_INTERNAL_SERVER_ERROR, 
+                'Error updating the post',
+                Response::HTTP_INTERNAL_SERVER_ERROR,
                 $e->getMessage()
             );
         }
@@ -298,17 +286,17 @@ class PostController extends Controller
             $post = Post::findOrFail($id);
             Gate::authorize('delete', $post); // Verify this user can delete a post
             $post->delete();
-            return $this->success('Post deleted successfully', '',  Response::HTTP_NO_CONTENT);
+            return $this->success('Post deleted successfully', '', Response::HTTP_NO_CONTENT);
         } catch (ModelNotFoundException $e) {
             return $this->error(
-                'Post not found.', 
-                Response::HTTP_NOT_FOUND, 
+                'Post not found.',
+                Response::HTTP_NOT_FOUND,
                 $e->getMessage()
             );
         } catch (\Exception $e) {
             return $this->error(
-                'Error deleting the post', 
-                Response::HTTP_INTERNAL_SERVER_ERROR, 
+                'Error deleting the post',
+                Response::HTTP_INTERNAL_SERVER_ERROR,
                 $e->getMessage()
             );
         }
@@ -323,16 +311,15 @@ class PostController extends Controller
             $post = Post::findOrFail($id);
             $comments = $post->comments()->paginate(15);
             return $this->ok('Comments fetched', $comments);
-            
         } catch (ModelNotFoundException $e) {
             return $this->error(
-                'Post not found.', 
+                'Post not found.',
                 Response::HTTP_NOT_FOUND
             );
         } catch (\Exception $e) {
             return $this->error(
-                'retrieving comments', 
-                Response::HTTP_INTERNAL_SERVER_ERROR, 
+                'retrieving comments',
+                Response::HTTP_INTERNAL_SERVER_ERROR,
                 $e->getMessage()
             );
         }
@@ -342,9 +329,9 @@ class PostController extends Controller
      *  Method to schedule posts in draft
      */
     public function schedule(
-        SchedulePostRequest $request, 
-        int $id): JsonResponse
-    {
+        SchedulePostRequest $request,
+        int $id
+    ): JsonResponse {
         try {
             $post = Post::findOrFail($id);
             Gate::authorize('update', $post);  // Verify this user can update a post
@@ -355,17 +342,16 @@ class PostController extends Controller
             ]);
             $postResource = new PostResource($post);
             return $this->ok('Post Scheduled', $postResource);
-            
         } catch (ModelNotFoundException $e) {
             return $this->error(
-                'Post not found.', 
-                Response::HTTP_NOT_FOUND, 
+                'Post not found.',
+                Response::HTTP_NOT_FOUND,
                 $e->getMessage()
             );
         } catch (\Exception $e) {
             return $this->error(
                 'scheduling the post',
-                Response::HTTP_INTERNAL_SERVER_ERROR, 
+                Response::HTTP_INTERNAL_SERVER_ERROR,
                 $e->getMessage()
             );
         }
@@ -386,17 +372,16 @@ class PostController extends Controller
             ]);
             $postResource = new PostResource($post);
             return $this->ok('Post Unpublished', $postResource);
-
         } catch (ModelNotFoundException $e) {
             return $this->error(
-                'Post not found.', 
-                Response::HTTP_NOT_FOUND, 
+                'Post not found.',
+                Response::HTTP_NOT_FOUND,
                 $e->getMessage()
             );
         } catch (\Exception $e) {
             return $this->error(
-                'Error occured unpublishing the post ', 
-                Response::HTTP_INTERNAL_SERVER_ERROR, 
+                'Error occured unpublishing the post ',
+                Response::HTTP_INTERNAL_SERVER_ERROR,
                 $e->getMessage()
             );
         }
@@ -414,17 +399,16 @@ class PostController extends Controller
 
             $postResource = new PostResource($post);
             return $this->ok('Post Published!', $postResource);
-            
         } catch (ModelNotFoundException $e) {
             return $this->error(
-                'Post not found.', 
-                Response::HTTP_NOT_FOUND, 
+                'Post not found.',
+                Response::HTTP_NOT_FOUND,
                 $e->getMessage()
             );
         } catch (\Exception $e) {
             return $this->error(
-                'Error occured publishing the post ', 
-                Response::HTTP_INTERNAL_SERVER_ERROR, 
+                'Error occured publishing the post ',
+                Response::HTTP_INTERNAL_SERVER_ERROR,
                 $e->getMessage()
             );
         }

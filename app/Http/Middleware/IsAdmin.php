@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Middleware;
 
 use Closure;
@@ -11,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 class IsAdmin
 {
     use ApiResponses;
+
     /**
      * Handle an incoming request.
      *

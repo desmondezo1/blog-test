@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Requests\Api;
 
 use Illuminate\Foundation\Http\FormRequest;
@@ -25,7 +27,7 @@ class LoginUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "email" => ['required','string', 'email', 'max:255'],
+            "email" => ['required', 'string', 'email', 'max:255'],
             "password" => ['required', 'string', 'min:8']
         ];
     }
@@ -35,7 +37,7 @@ class LoginUserRequest extends FormRequest
      *
      * @return array
      */
-    public function messages()
+    public function messages(): array
     {
         return [
             'email.required' => 'An email address is required.',
@@ -47,7 +49,7 @@ class LoginUserRequest extends FormRequest
         ];
     }
     
-    protected function failedValidation(Validator $validator)
+    protected function failedValidation(Validator $validator): void
     {
         throw new HttpResponseException(
             response()->json([
@@ -57,5 +59,4 @@ class LoginUserRequest extends FormRequest
             ], JsonResponse::HTTP_UNPROCESSABLE_ENTITY)
         );
     }
-
 }

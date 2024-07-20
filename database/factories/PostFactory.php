@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
 use App\Models\Post;
@@ -13,12 +15,17 @@ use Illuminate\Support\Str;
 class PostFactory extends Factory
 {
     /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = Post::class;
+
+    /**
      * Define the model's default state.
      *
      * @return array<string, mixed>
      */
-    protected $model = Post::class;
-
     public function definition(): array
     {
         $title = $this->faker->sentence;

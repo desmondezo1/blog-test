@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -10,13 +12,13 @@ use Laravel\Sanctum\Sanctum;
 
 class UserCRUDTest extends TestCase
 {
-
-    use RefreshDatabase, WithFaker;
+    use RefreshDatabase;
+    use WithFaker;
 
     /**
-     *   User should be able to register and receive a success object
+     * User should be able to register and receive a success object
      */
-    public function test_can_register_user()
+    public function testCanRegisterUser(): void
     {
         $userData = [
             'name' => $this->faker->name,
@@ -30,11 +32,11 @@ class UserCRUDTest extends TestCase
             ->assertJsonStructure([
                 "data" => [
                     "user" => [
-                        "id" ,
+                        "id",
                         "name",
-                        "email" ,
+                        "email",
                         "created_at",
-                        "updated_at" ,
+                        "updated_at",
                         "role"
                     ],
                     "access_token",
@@ -50,9 +52,9 @@ class UserCRUDTest extends TestCase
     }
 
     /**
-     *   User should be register with existing email
+     * User should not register with existing email
      */
-    public function test_should_not_register_user_with_existing_email()
+    public function testShouldNotRegisterUserWithExistingEmail(): void
     {
         $existingUser = User::factory()->create();
 
@@ -82,7 +84,5 @@ class UserCRUDTest extends TestCase
             ['The email has already been taken.'],
             $response->json('data.email')
         );
-
     }
-
 }

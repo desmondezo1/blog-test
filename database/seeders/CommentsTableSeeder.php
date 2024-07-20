@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Seeders;
 
 use App\Models\Comment;
@@ -17,6 +19,5 @@ class CommentsTableSeeder extends Seeder
         Post::all()->each(function ($post) {
             Comment::factory()->count(rand(1, 5))->create(['post_id' => $post->id]);
         });
-
     }
 }

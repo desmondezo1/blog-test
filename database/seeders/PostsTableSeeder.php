@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Seeders;
 
 use App\Models\Post;
@@ -15,12 +17,12 @@ class PostsTableSeeder extends Seeder
     public function run(): void
     {
         Post::factory()
-        ->count(100)
-        ->create()
-        ->each(function ($post) {
-            $post->tags()->attach(
-                Tag::inRandomOrder()->take(rand(1, 3))->pluck('id')->toArray()
-            );
-        });
+            ->count(100)
+            ->create()
+            ->each(function ($post) {
+                $post->tags()->attach(
+                    Tag::inRandomOrder()->take(rand(1, 3))->pluck('id')->toArray()
+                );
+            });
     }
 }

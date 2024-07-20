@@ -1,7 +1,8 @@
 <?php
 
-namespace Database\Factories;
+declare(strict_types=1);
 
+namespace Database\Factories;
 
 use App\Models\Post;
 use App\Models\User;
@@ -14,13 +15,18 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class CommentFactory extends Factory
 {
     /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = Comment::class;
+
+    /**
      * Define the model's default state.
      *
      * @return array<string, mixed>
      */
-    protected $model = Comment::class;
-
-    public function definition()
+    public function definition(): array
     {
         return [
             'post_id' => Post::factory(),

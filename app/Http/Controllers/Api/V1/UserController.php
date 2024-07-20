@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
@@ -16,9 +18,6 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Auth;
 
-
-
-
 class UserController extends Controller
 {
     use ApiResponses;
@@ -29,7 +28,6 @@ class UserController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
-
             $perPage = $request->input('per_page', 15);
             $page = $request->input('page', 1);
 
@@ -37,7 +35,7 @@ class UserController extends Controller
             $filter = new UserFilter($request);
 
             $usersQuery = $filter->apply(
-                $usersQuery, 
+                $usersQuery,
                 $request->user()->isAdministrator()
             );
 
@@ -47,7 +45,6 @@ class UserController extends Controller
                 "Users fetched successfully",
                 UserResource::collection($users)
             );
-
         } catch (QueryException $e) {
             return $this->error(
                 'An error occurred while fetching users.',
@@ -61,9 +58,7 @@ class UserController extends Controller
                 $e->getMessage()
             );
         }
-
     }
-
 
     /**
      * Store a newly created resource in storage.
@@ -71,7 +66,6 @@ class UserController extends Controller
     public function store(StoreUserRequest $request): JsonResponse
     {
         try {
-            
             $validated = $request->validated();
 
             $user = User::create([
@@ -85,7 +79,6 @@ class UserController extends Controller
             // Create a token for the user
             $token = $user->createToken('auth_token')->plainTextToken;
 
-
             return $this->success(
                 'User registered successfully',
                 [
@@ -95,7 +88,6 @@ class UserController extends Controller
                 ],
                 Response::HTTP_CREATED
             );
-
         } catch (\Exception $e) {
             return $this->error(
                 'An error occurred while registering the user ',
@@ -103,7 +95,6 @@ class UserController extends Controller
                 $e->getMessage()
             );
         }
-    
     }
 
     /**
@@ -114,22 +105,19 @@ class UserController extends Controller
         return $this->ok('Yes', $id);
     }
 
-
-
     /**
      * Update the specified resource in storage.
      */
     public function update(UpdateUserRequest $request, int $id): JsonResponse
     {
         try {
-
             $user = User::findOrFail($id);
             Gate::authorize('update', $user);
 
             $validated = $request->validated();
 
-            $validated['email'] = $request->user()->isAdministrator() ? $validated['email']: $user->email;
-            $validated['role'] = $request->user()->isAdministrator() ? $validated['role']:'reader';
+            $validated['email'] = $request->user()->isAdministrator() ? $validated['email'] : $user->email;
+            $validated['role'] = $request->user()->isAdministrator() ? $validated['role'] : 'reader';
 
             if (isset($validated['password'])) {
                 $validated['password'] = Hash::make($validated['password']);
@@ -139,19 +127,15 @@ class UserController extends Controller
             $userResource = new UserResource($user);
 
             return $this->ok('User updated', $userResource);
-
         } catch (ModelNotFoundException $e) {
-
             return $this->error(
-                'User not found', 
+                'User not found',
                 Response::HTTP_NOT_FOUND,
                 $e->getMessage()
             );
-
         } catch (\Exception $e) {
-            
             return $this->error(
-                'An error occurred while updating the user.', 
+                'An error occurred while updating the user.',
                 Response::HTTP_INTERNAL_SERVER_ERROR,
                 $e->getMessage()
             );
@@ -170,20 +154,19 @@ class UserController extends Controller
             $user->delete();
 
             return $this->success(
-                'User deleted!', 
+                'User deleted!',
                 null,
                 Response::HTTP_NO_CONTENT
             );
-
         } catch (ModelNotFoundException $e) {
             return $this->error(
-                'User not found.', 
+                'User not found.',
                 Response::HTTP_NOT_FOUND,
                 $e->getMessage()
             );
         } catch (\Exception $e) {
             return $this->error(
-                'An error occurred while deleting the user.: '.$e->getMessage(), 
+                'An error occurred while deleting the user.: ' . $e->getMessage(),
                 Response::HTTP_INTERNAL_SERVER_ERROR,
                 $e->getMessage()
             );

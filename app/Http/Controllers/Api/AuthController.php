@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
@@ -11,8 +13,7 @@ use App\Http\Requests\Api\LoginUserRequest;
 
 class AuthController extends Controller
 {
-
-   use ApiResponses;
+    use ApiResponses;
 
     /**
      * @OA\Post(
@@ -52,9 +53,9 @@ class AuthController extends Controller
      *     )
      * )
      */
-   public function login(LoginUserRequest $request) {
-
-    $credentials = $request->only('email', 'password');
+    public function login(LoginUserRequest $request)
+    {
+        $credentials = $request->only('email', 'password');
 
         if (!Auth::attempt($credentials)) {
             return $this->error('Invalid credentials', 401);
@@ -68,7 +69,7 @@ class AuthController extends Controller
                 'token' => $user->createToken('TOKEN FOR ' . $user->email)->plainTextToken
             ]
         );
-   }
+    }
 
     /**
      * @OA\Post(
@@ -97,8 +98,9 @@ class AuthController extends Controller
      *     )
      * )
      */
-   public function logout(Request $request){
-    $request->user()->currentAccessToken()->delete();
-    return $this->ok('Logged out Successfully');
-   }
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+        return $this->ok('Logged out Successfully');
+    }
 }

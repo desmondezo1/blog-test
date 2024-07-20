@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filters\V1;
 
 use Illuminate\Database\Eloquent\Builder;
@@ -7,8 +9,8 @@ use Illuminate\Http\Request;
 
 class UserFilter
 {
-    protected $request;
-    protected $query;
+    protected Request $request;
+    protected Builder $query;
 
     public function __construct(Request $request)
     {
@@ -25,15 +27,15 @@ class UserFilter
 
         if ($isAdmin) {
             $this->filterByRole()
-                 ->filterByStatus();
+                ->filterByStatus();
         }
 
         return $this->filterByName()
-                    ->filterByEmail()
-                    ->filterByCreatedDate()
-                    ->filterBySearch()
-                    ->sortBy()
-                    ->query;
+            ->filterByEmail()
+            ->filterByCreatedDate()
+            ->filterBySearch()
+            ->sortBy()
+            ->query;
     }
 
     protected function filterByRole(): self
@@ -86,7 +88,7 @@ class UserFilter
             $searchTerm = $this->request->search;
             $this->query->where(function ($query) use ($searchTerm) {
                 $query->where('name', 'like', "%{$searchTerm}%")
-                      ->orWhere('email', 'like', "%{$searchTerm}%");
+                    ->orWhere('email', 'like', "%{$searchTerm}%");
             });
         }
         return $this;

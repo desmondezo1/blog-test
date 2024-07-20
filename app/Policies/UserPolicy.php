@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Policies;
 
 use App\Models\User;
@@ -57,7 +59,6 @@ class UserPolicy
  
         // Allow users to delete their own account
         return $user->id === $user2->id;
-
     }
 
     /**
