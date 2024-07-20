@@ -105,5 +105,43 @@ To view the documentation of the API's of this project, you would need to start 
 
 For exmaple: https://localhost:8000/api/documentation
 
-The Documentation was done using OpenAPI (Swagger)
+The API Documentation was done using OpenAPI (Swagger)
 
+## Routes list
+
+```
+
+  GET|HEAD        / ................................................................................................. 
+  POST            api/auth/login ................................................... login › Api\AuthController@login
+  POST            api/auth/logout ......................................................... Api\AuthController@logout
+  POST            api/auth/register ..................................................... Api\AuthController@register
+  GET|HEAD        api/documentation ................. l5-swagger.default.api › L5Swagger\Http › SwaggerController@api
+  GET|HEAD        api/oauth2-callback l5-swagger.default.oauth2_callback › L5Swagger\Http › SwaggerController@oauth2…
+  GET|HEAD        api/v1/admin/posts .................................................... Api\V1\PostController@index
+  POST            api/v1/admin/posts .................................................... Api\V1\PostController@store
+  GET|HEAD        api/v1/admin/posts/status/{status} .............................. Api\V1\PostController@getByStatus
+  PUT             api/v1/admin/posts/{id} .............................................. Api\V1\PostController@update
+  DELETE          api/v1/admin/posts/{id} ............................................. Api\V1\PostController@destroy
+  POST            api/v1/admin/posts/{id}/publish ..................................... Api\V1\PostController@publish
+  POST            api/v1/admin/posts/{id}/schedule ................................... Api\V1\PostController@schedule
+  POST            api/v1/admin/posts/{id}/unpublish ................................. Api\V1\PostController@unpublish
+  GET|HEAD        api/v1/admin/users ...................................... users.index › Api\V1\UserController@index
+  POST            api/v1/admin/users ...................................... users.store › Api\V1\UserController@store
+  DELETE          api/v1/admin/users/{user} ........................... users.destroy › Api\V1\UserController@destroy
+  GET|HEAD        api/v1/posts .......................................................... Api\V1\PostController@index
+  GET|HEAD        api/v1/posts/author/{userId} .................................... Api\V1\PostController@getByAuthor
+  GET|HEAD        api/v1/posts/search .................................................. Api\V1\PostController@search
+  GET|HEAD        api/v1/posts/{id} ...................................................... Api\V1\PostController@show
+  GET|HEAD        api/v1/posts/{id}/comments ...................................... Api\V1\PostController@getComments
+  GET|HEAD        api/v1/posts/{id}/tags .............................................. Api\V1\PostController@getTags
+  POST            api/v1/users ............................................ users.store › Api\V1\UserController@store
+  GET|HEAD        api/v1/users/{user} ....................................... users.show › Api\V1\UserController@show
+  PUT|PATCH       api/v1/users/{user} ................................... users.update › Api\V1\UserController@update
+  DELETE          api/v1/users/{user} ................................. users.destroy › Api\V1\UserController@destroy
+  GET|HEAD        docs/asset/{asset} ....... l5-swagger.default.asset › L5Swagger\Http › SwaggerAssetController@index
+  GET|HEAD        docs/{jsonFile?} ................ l5-swagger.default.docs › L5Swagger\Http › SwaggerController@docs
+  GET|HEAD        sanctum/csrf-cookie ............. sanctum.csrf-cookie › Laravel\Sanctum › CsrfCookieController@show
+  GET|HEAD        up ................................................................................................ 
+
+       
+```
