@@ -182,7 +182,26 @@ class PostController extends Controller
     }
 
     /**
-     *  Create a new post [Requires API token]
+     * @OA\Post(
+     *     path="/api/v1/users",
+     *     tags={"Users"},
+     *     summary="Create a new user",
+     *     @OA\RequestBody(
+     *         
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="User created successfully",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error"
+     *     )
+     * )
+     * 
+     *   Create a new post [Requires API token]
+     * 
      */
     public function store(StorePostRequest $request): JsonResponse
     {
@@ -248,8 +267,35 @@ class PostController extends Controller
         }
     }
 
+
     /**
-     *  Update existing post [Requires API token].
+     * @OA\Put(
+     *     path="/api/v1/posts/{id}",
+     *     tags={"Posts"},
+     *     summary="Update a post",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Post updated successfully",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Post not found"
+     *     )
+     * )
+     * 
+     * Update existing post [Requires API token].
+     * 
      */
     public function update(
         UpdatePostRequest $request,
@@ -278,7 +324,29 @@ class PostController extends Controller
     }
 
     /**
-     *  Remove a post [Requires API token].
+     * @OA\Delete(
+     *     path="/api/v1/posts/{id}",
+     *     tags={"Posts"},
+     *     summary="Delete a post",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=204,
+     *         description="Post deleted successfully"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Post not found"
+     *     )
+     * )
+     * 
+     * Remove a post [Requires API token].
+     * 
      */
     public function destroy(int $id): JsonResponse
     {

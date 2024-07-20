@@ -25,6 +25,36 @@ class UserController extends Controller
     /**
      *   Fetch all users [For Admins Only]
      */
+    /**
+     * @OA\Get(
+     *     path="/api/v1/admin/users",
+     *     tags={"Admin"},
+     *     summary="Get all users",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         description="Page number",
+     *         required=false,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Parameter(
+     *         name="per_page",
+     *         in="query",
+     *         description="Items per page",
+     *         required=false,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items()
+     *         )
+     *     )
+     * )
+     */
     public function index(Request $request): JsonResponse
     {
         try {
@@ -60,8 +90,10 @@ class UserController extends Controller
         }
     }
 
+
     /**
-     * Store a newly created resource in storage.
+     * 
+     *  Store a newly created resource in storage.
      */
     public function store(StoreUserRequest $request): JsonResponse
     {
