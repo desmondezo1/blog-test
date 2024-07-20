@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Api\V1;
 
 
 use App\Models\Post;
+use App\Models\User;
 use App\Http\Resources\PostResource;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -95,11 +96,19 @@ class PostController extends Controller
     /**
      *   Get posts by Post Author
      */
-    public function getByAuthor(int $userId): JsonResponse
+    public function getByAuthor(Request $request, int $userId): JsonResponse
     {
         try {
             $user = User::findOrFail($userId);
-            $posts = $user->posts()->paginate(15);
+            $status = $request->query('status');
+
+            $postsQuery = $user->posts();
+
+            if ($status && $user->isAdministrator()) {
+                $postsQuery->where('status', $status);
+            }
+    
+            $posts = $postsQuery->paginate(15);
 
             return $this->ok(
                 "Posts fetched successfully", 
