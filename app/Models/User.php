@@ -34,6 +34,9 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    public function isAdministrator() {
+        return $this->where('role', 'admin')->exists();
+     }
 
     public function posts()
     {
