@@ -16,8 +16,8 @@ Follow these steps to get your development environment set up:
 1. Clone the repository
 
 ```
-git clone https://github.com/your-username/blog-post-api.git
-cd blog-post-api
+git clone https://github.com/desmondezo1/blog-test.git
+cd blog-test
 ```
 2. Install dependencies
 ```
