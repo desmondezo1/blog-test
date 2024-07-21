@@ -193,9 +193,21 @@ docker-compose exec app php artisan db:seed
 ```
 
 ### 8. Start laravel app 
+
+The App should be running at
+
+```
+http://localhost:8000
+
+```
+
+#### Alternatively You can just run the command
+
 [fix for issue with php FPM root]
 
 ```
+
 docker-compose exec app php artisan serve 
 ```
 
+Thank you 😊
