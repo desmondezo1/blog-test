@@ -16,8 +16,8 @@ Follow these steps to get your development environment set up:
 1. Clone the repository
 
 ```
-git clone https://github.com/your-username/blog-post-api.git
-cd blog-post-api
+git clone https://github.com/desmondezo1/blog-test.git
+cd blog-test
 ```
 2. Install dependencies
 ```
@@ -55,7 +55,9 @@ php artisan migrate
 php artisan db:seed
 ```
 
-8. Add configuration cron to your server (If you are hosting this project)
+> **Note**: The Default password for all users is "**password**"
+
+8. (optional) Add configuration cron to your server (If you are hosting this project)
 
 This will run the scheduled task to publish all scheduled posts every minute
 ```
