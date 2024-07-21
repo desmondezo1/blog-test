@@ -27,7 +27,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // User Routes (authenticated)
     Route::apiResource('users', UserController::class)->only(['update', 'destroy']);
 
-    // Admin Routes
+    // Admin Dashboard Routes
     Route::prefix('admin')->middleware(IsAdmin::class)->group(function () {
         // Admin Post Routes
         Route::prefix('posts')->group(function () {

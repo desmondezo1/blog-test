@@ -91,10 +91,34 @@ class UserController extends Controller
     }
 
 
+
     /**
+     * @OA\Post(
+     *     path="/api/v1/users",
+     *     tags={"Users"},
+     *     summary="Create a new user",
+     *     @OA\RequestBody(
+     *         @OA\JsonContent(
+     *             required={"email","password"},
+     *             @OA\Property(property="email", type="string", format="email", example="john.doe@example.com"),
+     *             @OA\Property(property="password", type="string", format="password", example="password123")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="User created successfully",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error"
+     *     )
+     * )
      * 
-     *  Store a newly created resource in storage.
+     *   Create a new User
+     * 
      */
+
     public function store(StoreUserRequest $request): JsonResponse
     {
         try {

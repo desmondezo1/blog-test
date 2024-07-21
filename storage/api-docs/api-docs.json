@@ -241,27 +241,54 @@
                 }
             }
         },
-        "/api/v1/users": {
+        "/api/v1/admin/posts": {
             "post": {
                 "tags": [
-                    "Users"
+                    "Admin"
                 ],
-                "summary": "Create a new user",
-                "operationId": "7f42b37c920a1c26500d6837b3817d39",
-                "requestBody": {},
+                "summary": "Create a post",
+                "operationId": "82d7d70f7a00eec6f34372369189b4de",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "example": "Post Title"
+                                    },
+                                    "content": {
+                                        "type": "string",
+                                        "example": "Post content"
+                                    },
+                                    "summary": {
+                                        "type": "string",
+                                        "example": "Helping Dogs"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
                 "responses": {
-                    "201": {
-                        "description": "User created successfully",
+                    "200": {
+                        "description": "Post Created successfully",
                         "content": {
                             "application/json": {
                                 "schema": {}
                             }
                         }
                     },
-                    "422": {
-                        "description": "Validation error"
+                    "404": {
+                        "description": "Post not found"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/api/v1/posts/{id}": {
@@ -384,6 +411,53 @@
                     }
                 ]
             }
+        },
+        "/api/v1/users": {
+            "post": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Create a new user",
+                "operationId": "64da9b5a20fa4f20e947ed61b2bbb6da",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "john.doe@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "User created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
         }
     },
     "tags": [
@@ -396,12 +470,12 @@
             "description": "Posts"
         },
         {
-            "name": "Users",
-            "description": "Users"
-        },
-        {
             "name": "Admin",
             "description": "Admin"
+        },
+        {
+            "name": "Users",
+            "description": "Users"
         }
     ]
 }

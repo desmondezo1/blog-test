@@ -169,11 +169,19 @@ docker-compose up -d --build
 docker-compose exec app composer install
 ```
 
-### 4. Copy the .env.example File to .env
-```
-cp .env.example .env
-```
+### 4. Edit/Create the .env file
 
+Add the following to the .env file:
+
+```
+DB_CONNECTION=mysql
+DB_HOST=db
+DB_PORT=3306
+DB_DATABASE=laravel
+DB_USERNAME=laravel
+DB_PASSWORD=secret
+
+```
 ### 5. Generate Application Key
 
 ```
@@ -191,3 +199,13 @@ docker-compose exec app php artisan migrate
 ```
 docker-compose exec app php artisan db:seed
 ```
+
+### 8. The API is LIVE on Port 8000!
+
+Visit [http://localhost:8000](http://localhost:8000)
+
+### 9. Visit the API documentation
+
+Visit ->
+
+[http://localhost:8000/api/documentation](http://localhost:8000/api/documentation)

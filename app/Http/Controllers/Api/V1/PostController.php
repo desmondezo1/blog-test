@@ -181,26 +181,31 @@ class PostController extends Controller
         }
     }
 
-    /**
+        /**
      * @OA\Post(
-     *     path="/api/v1/users",
-     *     tags={"Users"},
-     *     summary="Create a new user",
+     *     path="/api/v1/admin/posts",
+     *     tags={"Admin"},
+     *     summary="Create a post",
+     *     security={{"bearerAuth":{}}},
      *     @OA\RequestBody(
-     *         
+     *         @OA\JsonContent(
+     *             @OA\Property(property="title", type="string", example="Post Title"),
+     *             @OA\Property(property="content", type="string", example="Post content"),
+     *             @OA\Property(property="summary", type="string", example="Helping Dogs")
+     *          )
      *     ),
      *     @OA\Response(
-     *         response=201,
-     *         description="User created successfully",
+     *         response=200,
+     *         description="Post Created successfully",
      *         @OA\JsonContent()
      *     ),
      *     @OA\Response(
-     *         response=422,
-     *         description="Validation error"
+     *         response=404,
+     *         description="Post not found"
      *     )
      * )
      * 
-     *   Create a new post [Requires API token]
+     * Create a post .
      * 
      */
     public function store(StorePostRequest $request): JsonResponse
