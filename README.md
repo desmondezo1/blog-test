@@ -55,7 +55,9 @@ php artisan migrate
 php artisan db:seed
 ```
 
-8. Add configuration cron to your server (If you are hosting this project)
+> **Note**: The Default password for all users is "**password**"
+
+8. (optional) Add configuration cron to your server (If you are hosting this project)
 
 This will run the scheduled task to publish all scheduled posts every minute
 ```
