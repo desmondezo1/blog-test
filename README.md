@@ -191,3 +191,11 @@ docker-compose exec app php artisan migrate
 ```
 docker-compose exec app php artisan db:seed
 ```
+
+### 8. Start laravel app 
+[fix for issue with php FPM root]
+
+```
+docker-compose exec app php artisan serve 
+```
+
