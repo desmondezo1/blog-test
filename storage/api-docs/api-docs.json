@@ -162,33 +162,21 @@
                 ]
             }
         },
-        "/api/v1/posts": {
+        "/api/v1/admin/posts/status/{status}": {
             "get": {
                 "tags": [
-                    "Posts"
+                    "Admin"
                 ],
-                "summary": "Fetch all Posts",
-                "description": "Fetch all published posts for non-admins \n     *          and All post types for admins",
-                "operationId": "7b253f6aade6833019f938c1f2ef08ed",
+                "summary": "Get posts by status",
+                "description": "Fetch posts by their status",
+                "operationId": "getPostsByStatus",
                 "parameters": [
                     {
-                        "name": "page",
-                        "in": "query",
-                        "description": "Page number for pagination",
-                        "required": false,
+                        "name": "status",
+                        "in": "path",
+                        "required": true,
                         "schema": {
-                            "type": "integer",
-                            "default": 1
-                        }
-                    },
-                    {
-                        "name": "per_page",
-                        "in": "query",
-                        "description": "Number of items per page",
-                        "required": false,
-                        "schema": {
-                            "type": "integer",
-                            "default": 15
+                            "type": "string"
                         }
                     }
                 ],
@@ -210,26 +198,28 @@
                                         "data": {
                                             "type": "object",
                                             "example": "{...}"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Posts not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 404
                                         },
-                                        "pagination": {
-                                            "properties": {
-                                                "total": {
-                                                    "type": "integer",
-                                                    "example": 50
-                                                },
-                                                "per_page": {
-                                                    "type": "integer",
-                                                    "example": 15
-                                                },
-                                                "current_page": {
-                                                    "type": "integer",
-                                                    "example": 1
-                                                },
-                                                "last_page": {
-                                                    "type": "integer",
-                                                    "example": 4
-                                                }
-                                            },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No posts found with the given status"
+                                        },
+                                        "data": {
                                             "type": "object"
                                         }
                                     },
@@ -241,29 +231,101 @@
                 }
             }
         },
-        "/api/v1/admin/posts": {
+        "/api/v1/admin/posts/{id}/publish": {
             "post": {
                 "tags": [
                     "Admin"
                 ],
-                "summary": "Create a post",
-                "operationId": "82d7d70f7a00eec6f34372369189b4de",
+                "summary": "Publish a post",
+                "description": "Publish a post by its ID",
+                "operationId": "publishPost",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Post published successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Post published successfully"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Post not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 404
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Post not found"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/admin/posts/{id}/schedule": {
+            "post": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Schedule a post",
+                "description": "Schedule a post by its ID",
+                "operationId": "schedulePost",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
                 "requestBody": {
                     "content": {
                         "application/json": {
                             "schema": {
                                 "properties": {
-                                    "title": {
+                                    "schedule_date": {
                                         "type": "string",
-                                        "example": "Post Title"
-                                    },
-                                    "content": {
-                                        "type": "string",
-                                        "example": "Post content"
-                                    },
-                                    "summary": {
-                                        "type": "string",
-                                        "example": "Helping Dogs"
+                                        "format": "date-time",
+                                        "example": "2024-08-01T12:00:00Z"
                                     }
                                 },
                                 "type": "object"
@@ -273,120 +335,135 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Post Created successfully",
+                        "description": "Post scheduled successfully",
                         "content": {
                             "application/json": {
-                                "schema": {}
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Post scheduled successfully"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
                             }
                         }
                     },
                     "404": {
-                        "description": "Post not found"
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/api/v1/posts/{id}": {
-            "put": {
-                "tags": [
-                    "Posts"
-                ],
-                "summary": "Update a post",
-                "operationId": "98c3c32a86125c864caa21999f234493",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {}
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Post updated successfully",
+                        "description": "Post not found",
                         "content": {
                             "application/json": {
-                                "schema": {}
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 404
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Post not found"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
                             }
                         }
-                    },
-                    "404": {
-                        "description": "Post not found"
                     }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            },
-            "delete": {
-                "tags": [
-                    "Posts"
-                ],
-                "summary": "Delete a post",
-                "operationId": "82927d2153173c1a7d6ab1e9d52ff56e",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "Post deleted successfully"
-                    },
-                    "404": {
-                        "description": "Post not found"
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
+                }
             }
         },
-        "/api/v1/admin/users": {
-            "get": {
+        "/api/v1/admin/posts/{id}/unpublish": {
+            "post": {
                 "tags": [
                     "Admin"
                 ],
-                "summary": "Get all users",
-                "operationId": "fc65edafdac24a4432c0c5291d4a11e9",
+                "summary": "Unpublish a post",
+                "description": "Unpublish a post by its ID",
+                "operationId": "unpublishPost",
                 "parameters": [
                     {
-                        "name": "page",
-                        "in": "query",
-                        "description": "Page number",
-                        "required": false,
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
                         "schema": {
                             "type": "integer"
                         }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Post unpublished successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Post unpublished successfully"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
+                    "404": {
+                        "description": "Post not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 404
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Post not found"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/posts/author/{userId}": {
+            "get": {
+                "tags": [
+                    "Posts"
+                ],
+                "summary": "Get posts by author",
+                "description": "Fetch posts by the author's user ID",
+                "operationId": "getPostsByAuthor",
+                "parameters": [
                     {
-                        "name": "per_page",
-                        "in": "query",
-                        "description": "Items per page",
-                        "required": false,
+                        "name": "userId",
+                        "in": "path",
+                        "required": true,
                         "schema": {
                             "type": "integer"
                         }
@@ -398,45 +475,509 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {}
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Posts retrieved successfully"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "example": "{...}"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Posts not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 404
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No posts found for the given author"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
                                 }
                             }
                         }
                     }
-                },
-                "security": [
+                }
+            }
+        },
+        "/api/v1/posts/search": {
+            "get": {
+                "tags": [
+                    "Posts"
+                ],
+                "summary": "Search posts",
+                "description": "Search posts by query parameters",
+                "operationId": "searchPosts",
+                "parameters": [
                     {
-                        "bearerAuth": []
+                        "name": "query",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
                     }
-                ]
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Search successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Posts found"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "example": "{...}"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No posts found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 404
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No posts found"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/posts/{id}/comments": {
+            "get": {
+                "tags": [
+                    "Posts"
+                ],
+                "summary": "Get comments for a post",
+                "description": "Fetch comments for a post by its ID",
+                "operationId": "getPostComments",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Comments retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Comments retrieved successfully"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "example": "{...}"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Post not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 404
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Post not found"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/posts/{id}/tags": {
+            "get": {
+                "tags": [
+                    "Posts"
+                ],
+                "summary": "Get tags for a post",
+                "description": "Fetch tags for a post by its ID",
+                "operationId": "getPostTags",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Tags retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Tags retrieved successfully"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "example": "{...}"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Post not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 404
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Post not found"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
             }
         },
         "/api/v1/users": {
             "post": {
+              "tags": [
+                "Users"
+              ],
+              "summary": "Create a new user",
+              "description": "This create a new user and returns an Auth Token ",
+              "operationId": "storeUser",
+              "requestBody": {
+                "required": true,
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "required": [
+                        "email",
+                        "password"
+                      ],
+                      "properties": {
+                        "name": {
+                            "type": "string",
+                            "example": "Desmond Pass"
+                          },
+                        "email": {
+                          "type": "string",
+                          "format": "email",
+                          "example": "dezy@example.com"
+                        },
+                        "password": {
+                          "type": "string",
+                          "format": "password",
+                          "example": "password123"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  }
+                }
+              },
+              "responses": {
+                "201": {
+                    "description": "User created successfully",
+                    "content": {
+                      "application/json": {
+                        "schema": {
+                          "type": "object",
+                          "properties": {
+                            "data": {
+                              "type": "object",
+                              "properties": {
+                                "user": {
+                                  "type": "object",
+                                  "properties": {
+                                    "id": {
+                                      "type": "integer",
+                                      "example": 17
+                                    },
+                                    "name": {
+                                      "type": "string",
+                                      "example": "DforDEz"
+                                    },
+                                    "email": {
+                                      "type": "string",
+                                      "example": "d778ess@gmwjail.com"
+                                    },
+                                    "created_at": {
+                                      "type": "string",
+                                      "format": "date-time",
+                                      "example": "2024-07-20 19:59:57"
+                                    },
+                                    "updated_at": {
+                                      "type": "string",
+                                      "format": "date-time",
+                                      "example": "2024-07-20 19:59:57"
+                                    },
+                                    "role": {
+                                      "type": "string",
+                                      "example": "reader"
+                                    }
+                                  }
+                                },
+                                "access_token": {
+                                  "type": "string",
+                                  "example": "20|QgsJiHkL8oQwvujEe26yqYwKE7cFuTTO7UTcPVMp0a4d385a"
+                                },
+                                "token_type": {
+                                  "type": "string",
+                                  "example": "Bearer"
+                                }
+                              }
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "User registered successfully"
+                            },
+                            "status": {
+                              "type": "integer",
+                              "example": 201
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                "422": {
+                  "description": "Validation error",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "type": "object",
+                        "properties": {
+                          "status": {
+                            "type": "integer",
+                            "example": 422
+                          },
+                          "message": {
+                            "type": "string",
+                            "example": "Validation error"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "503": {
+                  "description": "Service Unavailable",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "type": "object",
+                        "properties": {
+                          "status": {
+                            "type": "integer",
+                            "example": 503
+                          },
+                          "message": {
+                            "type": "string",
+                            "example": "An error occured creating user"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+        "/api/v1/users/{user}": {
+            "get": {
                 "tags": [
                     "Users"
                 ],
-                "summary": "Create a new user",
-                "operationId": "64da9b5a20fa4f20e947ed61b2bbb6da",
+                "summary": "Get user by ID",
+                "description": "Fetch user details by their ID",
+                "operationId": "getUserById",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "User retrieved successfully"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "example": "{...}"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 404
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "User not found"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Update user",
+                "description": "Update user details by their ID",
+                "operationId": "updateUser",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
                 "requestBody": {
                     "content": {
                         "application/json": {
                             "schema": {
-                                "required": [
-                                    "email",
-                                    "password"
-                                ],
                                 "properties": {
                                     "email": {
                                         "type": "string",
                                         "format": "email",
-                                        "example": "john.doe@example.com"
+                                        "example": "user@example.com"
                                     },
                                     "password": {
                                         "type": "string",
                                         "format": "password",
-                                        "example": "password123"
+                                        "example": "newpassword123"
                                     }
                                 },
                                 "type": "object"
@@ -445,16 +986,149 @@
                     }
                 },
                 "responses": {
-                    "201": {
-                        "description": "User created successfully",
+                    "200": {
+                        "description": "User updated successfully",
                         "content": {
                             "application/json": {
-                                "schema": {}
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "User updated successfully"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
                             }
                         }
                     },
-                    "422": {
-                        "description": "Validation error"
+                    "404": {
+                        "description": "User not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 404
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "User not found"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Delete user",
+                "description": "Delete user by their ID",
+                "operationId": "deleteUser",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "User deleted successfully"
+                    },
+                    "404": {
+                        "description": "User not found"
+                    }
+                }
+            }
+        },
+        "/api/documentation": {
+            "get": {
+                "tags": [
+                    "Documentation"
+                ],
+                "summary": "API Documentation",
+                "description": "Fetch the API documentation",
+                "operationId": "getDocumentation",
+                "responses": {
+                    "200": {
+                        "description": "Documentation retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Documentation retrieved successfully"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "example": "{...}"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/oauth2-callback": {
+            "get": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "OAuth2 Callback",
+                "description": "Handle the OAuth2 callback",
+                "operationId": "oauth2Callback",
+                "responses": {
+                    "200": {
+                        "description": "Callback handled successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Callback handled successfully"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "example": "{...}"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -476,6 +1150,18 @@
         {
             "name": "Users",
             "description": "Users"
+        },
+        {
+            "name": "Documentation",
+            "description": "Documentation"
+        },
+        {
+            "name": "Deprecated",
+            "description": "All deprecated routes and will be removed in next version."
+        },
+        {
+            "name": "UnderConstruction",
+            "description": "All UnderConstruction routes will be made available soon."
         }
     ]
 }

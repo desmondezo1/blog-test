@@ -116,7 +116,6 @@ The API Documentation was done using OpenAPI (Swagger)
   GET|HEAD        / ................................................................................................. 
   POST            api/auth/login ................................................... login › Api\AuthController@login
   POST            api/auth/logout ......................................................... Api\AuthController@logout
-  POST            api/auth/register ..................................................... Api\AuthController@register
   GET|HEAD        api/documentation ................. l5-swagger.default.api › L5Swagger\Http › SwaggerController@api
   GET|HEAD        api/oauth2-callback l5-swagger.default.oauth2_callback › L5Swagger\Http › SwaggerController@oauth2…
   GET|HEAD        api/v1/admin/posts .................................................... Api\V1\PostController@index
