@@ -38,7 +38,7 @@ class UserFactory extends Factory
             'email' => $this->faker->unique()->safeEmail,
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
-            'role' => $this->faker->randomElement(['admin', 'author', 'reader']),
+            'role' => $this->faker->randomElement(['admin', 'author']),
             'is_active' => $this->faker->boolean(80),
             'last_login_at' => $this->faker->dateTimeThisYear(),
         ];

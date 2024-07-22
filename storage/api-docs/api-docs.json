@@ -520,6 +520,95 @@
                 }
             }
         },
+        "/api/v1/posts/":{
+            "get":{
+                "operationId": "Fetch all posts",
+                "description": "Fetch all post. non admins will get only published posts",
+                "summary":"Fetch all posts",
+                "tags":["Posts"],
+                "parameters":[
+
+                ]
+            }
+        },
+        "/api/v1/admin/posts/{id}": {
+            "delete": {
+              "summary": "Delete a post",
+              "description": "This endpoint allows you to delete a post by its ID.",
+              "tags": ["Admin"],
+              "parameters": [
+                {
+                  "name": "id",
+                  "in": "path",
+                  "required": true,
+                  "description": "The ID of the post to delete",
+                  "schema": {
+                    "type": "integer",
+                    "example": 1
+                  }
+                }
+              ],
+              "responses": {
+                "200": {
+                  "description": "Post deleted successfully",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "type": "object",
+                        "properties": {
+                          "message": {
+                            "type": "string",
+                            "example": "Post deleted successfully"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "404": {
+                  "description": "Post not found",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "type": "object",
+                        "properties": {
+                          "message": {
+                            "type": "string",
+                            "example": "Post not found"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "500": {
+                  "description": "An error occurred while deleting the post",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "type": "object",
+                        "properties": {
+                          "message": {
+                            "type": "string",
+                            "example": "An error occurred while deleting the post"
+                          },
+                          "error": {
+                            "type": "string",
+                            "example": "Detailed error message"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "security": [
+                {
+                  "bearerAuth": []
+                }
+              ]
+            }
+        },
         "/api/v1/posts/search": {
             "get": {
                 "tags": [
@@ -733,10 +822,10 @@
                 }
             }
         },
-        "/api/v1/users": {
+        "/api/v1/admin/users": {
             "post": {
               "tags": [
-                "Users", "Admin"
+                 "Admin"
               ],
               "summary": "Create a new user",
               "description": "This create a new user and returns an Auth Token ",
@@ -809,7 +898,7 @@
                                     },
                                     "role": {
                                       "type": "string",
-                                      "example": "reader"
+                                      "example": "author"
                                     }
                                   }
                                 },
@@ -878,11 +967,11 @@
                 }
               }
             }
-          },
-        "/api/v1/users/{user}": {
+        },
+        "/api/v1/admin/users/{id}": {
             "get": {
                 "tags": [
-                    "Admin"
+                    "UnderConstruction"
                 ],
                 "summary": "Get user by ID",
                 "description": "Fetch user details by their ID",
@@ -949,7 +1038,7 @@
             },
             "put": {
                 "tags": [
-                    "Users","Admin"
+                    "Admin"
                 ],
                 "summary": "Update user",
                 "description": "Update user details by their ID | Only admins can update email and Roles of other users ",
@@ -975,7 +1064,7 @@
                                     },
                                     "role": {
                                         "type": "string",
-                                        "example": "reader"
+                                        "example": "author"
                                     },
                                     "email": {
                                         "type": "string",
@@ -1069,40 +1158,127 @@
                 }
             }
         },
-        "/api/oauth2-callback": {
-            "get": {
-                "tags": [
-                    "Authentication"
-                ],
-                "summary": "OAuth2 Callback",
-                "description": "Handle the OAuth2 callback",
-                "operationId": "oauth2Callback",
-                "responses": {
-                    "200": {
-                        "description": "Callback handled successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "status": {
-                                            "type": "integer",
-                                            "example": 200
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Callback handled successfully"
-                                        },
-                                        "data": {
-                                            "type": "object",
-                                            "example": "{...}"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
+        "/api/v1/admin/authors": {
+            "post": {
+              "summary": "Create a new author",
+              "description": "This endpoint allows you to create a new author user.",
+              "tags": ["Authors"],
+              "requestBody": {
+                "required": true,
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "example": "John Doe"
+                        },
+                        "email": {
+                          "type": "string",
+                          "example": "john.doe@example.com"
+                        },
+                        "password": {
+                          "type": "string",
+                          "example": "password123"
                         }
+                      },
+                      "required": ["name", "email", "password"]
                     }
+                  }
                 }
+              },
+              "responses": {
+                "201": {
+                  "description": "User registered successfully",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "type": "object",
+                        "properties": {
+                          "message": {
+                            "type": "string",
+                            "example": "User registered successfully"
+                          },
+                          "data": {
+                            "type": "object",
+                            "properties": {
+                              "user": {
+                                "type": "object",
+                                "properties": {
+                                  "id": {
+                                    "type": "integer",
+                                    "example": 1
+                                  },
+                                  "name": {
+                                    "type": "string",
+                                    "example": "John Doe"
+                                  },
+                                  "email": {
+                                    "type": "string",
+                                    "example": "john.doe@example.com"
+                                  },
+                                  "role": {
+                                    "type": "string",
+                                    "example": "author"
+                                  },
+                                  "is_active": {
+                                    "type": "boolean",
+                                    "example": true
+                                  },
+                                  "created_at": {
+                                    "type": "string",
+                                    "format": "date-time",
+                                    "example": "2023-07-21T17:32:28Z"
+                                  },
+                                  "updated_at": {
+                                    "type": "string",
+                                    "format": "date-time",
+                                    "example": "2023-07-21T17:32:28Z"
+                                  }
+                                }
+                              },
+                              "access_token": {
+                                "type": "string",
+                                "example": "some-jwt-token"
+                              },
+                              "token_type": {
+                                "type": "string",
+                                "example": "Bearer"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "500": {
+                  "description": "An error occurred while creating the author",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "type": "object",
+                        "properties": {
+                          "message": {
+                            "type": "string",
+                            "example": "An error occurred while creating the author"
+                          },
+                          "error": {
+                            "type": "string",
+                            "example": "Detailed error message"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "security": [
+                {
+                  "bearerAuth": []
+                }
+              ]
             }
         }
     },
@@ -1122,6 +1298,10 @@
         {
             "name": "Users",
             "description": "Users"
+        },
+        {
+            "name": "Authors",
+            "description": "Athours"
         },
         {
             "name": "Deprecated",

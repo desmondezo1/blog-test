@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 use App\Models\User;
 use App\Http\Controllers\Api\V1\PostController;
 use App\Http\Controllers\Api\V1\UserController;
+use App\Http\Controllers\Api\V1\AuthorController;
 use App\Http\Middleware\IsAdmin;
 
 // Public Post Routes
@@ -19,16 +20,12 @@ Route::prefix('posts')->group(function () {
     Route::get('/{id}', [PostController::class, 'show']);
 });
 
-// Public User Routes
-Route::apiResource('users', UserController::class)->only(['show', 'store']);
 
 // Protected Routes [Requires token]
 Route::middleware(['auth:sanctum'])->group(function () {
-    // User Routes (authenticated)
-    Route::apiResource('users', UserController::class)->only(['update', 'destroy']);
 
     // Admin Dashboard Routes
-    Route::prefix('admin')->middleware(IsAdmin::class)->group(function () {
+    Route::prefix('admin')->group(function () {
         // Admin Post Routes
         Route::prefix('posts')->group(function () {
             Route::get('/', [PostController::class, 'index']);
@@ -42,7 +39,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
         });
 
         // Admin User Routes 
-        Route::apiResource('users', UserController::class)->only(['index']);
-        Route::apiResource('users', UserController::class)->except(['show', 'update']);
+        Route::apiResource('users', UserController::class)
+            ->only(['index','update', 'destroy','show', 'store'])->middleware(IsAdmin::class);
+
+        //Author Routes
+        Route::post('authors', [AuthorController::class,'store']);
+
     });
 });
