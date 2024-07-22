@@ -119,16 +119,17 @@ class UserController extends Controller
      * 
      */
 
-    public function store(StoreUserRequest $request): JsonResponse
+    public function store(StoreUserRequest $request)
     {
         try {
+            // return $request->all();
             $validated = $request->validated();
-
+            
             $user = User::create([
                 'name' => $validated['name'],
                 'email' => $validated['email'],
                 'password' => Hash::make($request->password),
-                'role' => 'reader',
+                'role' => $request->role,
                 'is_active' => $request->status ?? 1,
             ]);
 
@@ -146,7 +147,7 @@ class UserController extends Controller
             );
         } catch (\Exception $e) {
             return $this->error(
-                'An error occurred while registering the user ',
+                'An error occurred while registering the user: '.$e->getMessage(),
                 Response::HTTP_INTERNAL_SERVER_ERROR,
                 $e->getMessage()
             );
@@ -173,7 +174,7 @@ class UserController extends Controller
             $validated = $request->validated();
 
             $validated['email'] = $request->user()->isAdministrator() ? $validated['email'] : $user->email;
-            $validated['role'] = $request->user()->isAdministrator() ? $validated['role'] : 'reader';
+            $validated['role'] = $request->user()->isAdministrator() ? $validated['role'] : 'author';
 
             if (isset($validated['password'])) {
                 $validated['password'] = Hash::make($validated['password']);

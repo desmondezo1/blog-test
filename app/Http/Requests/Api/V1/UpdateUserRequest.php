@@ -30,7 +30,7 @@ class UpdateUserRequest extends FormRequest
             'name' => 'sometimes|string|max:255',
             'email' => 'sometimes|string|email|max:255',
             'password' => 'sometimes|string|min:8',
-            'role' => 'sometimes|string|in:admin,author,reader',
+            'role' => 'sometimes|string|in:admin,author',
         ];
     }
 

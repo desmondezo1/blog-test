@@ -125,7 +125,7 @@ class PostController extends Controller
     {
         try {
             $query = $request->get('query');
-            Post::with('user')
+            $posts = Post::with('user')
                 ->where(function ($queryBuilder) use ($query) {
                     $queryBuilder->where('title', 'like', "%{$query}%")
                         ->orWhere('content', 'like', "%{$query}%");
@@ -138,7 +138,7 @@ class PostController extends Controller
             );
         } catch (\Exception $e) {
             return $this->error(
-                'An error occurred while searching posts',
+                'An error occurred while searching posts: '.$e->getMessage(),
                 Response::HTTP_INTERNAL_SERVER_ERROR,
                 $e->getMessage()
             );
@@ -359,7 +359,7 @@ class PostController extends Controller
             $post = Post::findOrFail($id);
             Gate::authorize('delete', $post); // Verify this user can delete a post
             $post->delete();
-            return $this->success('Post deleted successfully', '', Response::HTTP_NO_CONTENT);
+            return $this->success('Post deleted successfully', [], Response::HTTP_NO_CONTENT);
         } catch (ModelNotFoundException $e) {
             return $this->error(
                 'Post not found.',
