@@ -736,7 +736,7 @@
         "/api/v1/users": {
             "post": {
               "tags": [
-                "Users"
+                "Users", "Admin"
               ],
               "summary": "Create a new user",
               "description": "This create a new user and returns an Auth Token ",
@@ -882,7 +882,7 @@
         "/api/v1/users/{user}": {
             "get": {
                 "tags": [
-                    "Users"
+                    "Admin"
                 ],
                 "summary": "Get user by ID",
                 "description": "Fetch user details by their ID",
@@ -949,14 +949,14 @@
             },
             "put": {
                 "tags": [
-                    "Users"
+                    "Users","Admin"
                 ],
                 "summary": "Update user",
-                "description": "Update user details by their ID",
+                "description": "Update user details by their ID | Only admins can update email and Roles of other users ",
                 "operationId": "updateUser",
                 "parameters": [
                     {
-                        "name": "user",
+                        "name": "id",
                         "in": "path",
                         "required": true,
                         "schema": {
@@ -969,6 +969,14 @@
                         "application/json": {
                             "schema": {
                                 "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Desmond Ezo-Ojile"
+                                    },
+                                    "role": {
+                                        "type": "string",
+                                        "example": "reader"
+                                    },
                                     "email": {
                                         "type": "string",
                                         "format": "email",
@@ -1036,10 +1044,10 @@
             },
             "delete": {
                 "tags": [
-                    "Users"
+                    "Users","Admin"
                 ],
                 "summary": "Delete user",
-                "description": "Delete user by their ID",
+                "description": "Delete user by their ID : A user can delete its own account, and an Admin as well ",
                 "operationId": "deleteUser",
                 "parameters": [
                     {
@@ -1109,7 +1117,7 @@
         },
         {
             "name": "Admin",
-            "description": "Admin"
+            "description": "Routes for the Admin dashboard"
         },
         {
             "name": "Users",
