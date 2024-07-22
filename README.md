@@ -55,7 +55,9 @@ php artisan migrate
 php artisan db:seed
 ```
 
-> **Note**: The Default password for all users is "**password**"
+> **Note**: The Default Admin user is **desmond@test.com** and password for all users is "**password**"
+>> **Email: desmond@test.com**
+>> **Password: password**
 
 8. (optional) Add configuration cron to your server (If you are hosting this project)
 
@@ -68,6 +70,21 @@ This will run the scheduled task to publish all scheduled posts every minute
 ```
 php artisan serve
 ```
+
+## How to Use API
+
+The project is running at http://localhost:800
+
+Visit the api documentation at http://localhost:800/api/documentation
+
+Login to default admin user accoun to get access token
+
+> Make a POST request to http://localhost:800/api/auth/login
+> The Login request object should contain the email and password :
+>> **email: desmond@test.com**
+>> **password: password**
+
+
 
 ## Additional Commands
 
@@ -113,37 +130,29 @@ The API Documentation was done using OpenAPI (Swagger)
 
 ```
 
-  GET|HEAD        / ................................................................................................. 
-  POST            api/auth/login ................................................... login › Api\AuthController@login
-  POST            api/auth/logout ......................................................... Api\AuthController@logout
-  GET|HEAD        api/documentation ................. l5-swagger.default.api › L5Swagger\Http › SwaggerController@api
-  GET|HEAD        api/oauth2-callback l5-swagger.default.oauth2_callback › L5Swagger\Http › SwaggerController@oauth2…
-  GET|HEAD        api/v1/admin/posts .................................................... Api\V1\PostController@index
-  POST            api/v1/admin/posts .................................................... Api\V1\PostController@store
-  GET|HEAD        api/v1/admin/posts/status/{status} .............................. Api\V1\PostController@getByStatus
-  PUT             api/v1/admin/posts/{id} .............................................. Api\V1\PostController@update
-  DELETE          api/v1/admin/posts/{id} ............................................. Api\V1\PostController@destroy
-  POST            api/v1/admin/posts/{id}/publish ..................................... Api\V1\PostController@publish
-  POST            api/v1/admin/posts/{id}/schedule ................................... Api\V1\PostController@schedule
-  POST            api/v1/admin/posts/{id}/unpublish ................................. Api\V1\PostController@unpublish
-  GET|HEAD        api/v1/admin/users ...................................... users.index › Api\V1\UserController@index
-  POST            api/v1/admin/users ...................................... users.store › Api\V1\UserController@store
-  DELETE          api/v1/admin/users/{user} ........................... users.destroy › Api\V1\UserController@destroy
-  GET|HEAD        api/v1/posts .......................................................... Api\V1\PostController@index
-  GET|HEAD        api/v1/posts/author/{userId} .................................... Api\V1\PostController@getByAuthor
-  GET|HEAD        api/v1/posts/search .................................................. Api\V1\PostController@search
-  GET|HEAD        api/v1/posts/{id} ...................................................... Api\V1\PostController@show
-  GET|HEAD        api/v1/posts/{id}/comments ...................................... Api\V1\PostController@getComments
-  GET|HEAD        api/v1/posts/{id}/tags .............................................. Api\V1\PostController@getTags
-  POST            api/v1/users ............................................ users.store › Api\V1\UserController@store
-  GET|HEAD        api/v1/users/{user} ....................................... users.show › Api\V1\UserController@show
-  PUT|PATCH       api/v1/users/{user} ................................... users.update › Api\V1\UserController@update
-  DELETE          api/v1/users/{user} ................................. users.destroy › Api\V1\UserController@destroy
-  GET|HEAD        docs/asset/{asset} ....... l5-swagger.default.asset › L5Swagger\Http › SwaggerAssetController@index
-  GET|HEAD        docs/{jsonFile?} ................ l5-swagger.default.docs › L5Swagger\Http › SwaggerController@docs
-  GET|HEAD        sanctum/csrf-cookie ............. sanctum.csrf-cookie › Laravel\Sanctum › CsrfCookieController@show
-  GET|HEAD        up ................................................................................................ 
-
+  POST            api/auth/login .................................. login › Api\AuthController@login
+  POST            api/auth/logout ........................................ Api\AuthController@logout
+  GET|HEAD        api/documentation l5-swagger.default.api › L5Swagger\Http › SwaggerController@api
+  GET|HEAD        api/oauth2-callback l5-swagger.default.oauth2_callback › L5Swagger\Http › Swagger…
+  POST            api/v1/admin/authors ............................... Api\V1\AuthorController@store
+  GET|HEAD        api/v1/admin/posts ................................... Api\V1\PostController@index
+  POST            api/v1/admin/posts ................................... Api\V1\PostController@store
+  GET|HEAD        api/v1/admin/posts/status/{status} ............. Api\V1\PostController@getByStatus
+  PUT             api/v1/admin/posts/{id} ............................. Api\V1\PostController@update
+  DELETE          api/v1/admin/posts/{id} ............................ Api\V1\PostController@destroy
+  POST            api/v1/admin/posts/{id}/publish .................... Api\V1\PostController@publish
+  POST            api/v1/admin/posts/{id}/schedule .................. Api\V1\PostController@schedule
+  POST            api/v1/admin/posts/{id}/unpublish ................ Api\V1\PostController@unpublish
+  GET|HEAD        api/v1/admin/users ..................... users.index › Api\V1\UserController@index
+  POST            api/v1/admin/users ..................... users.store › Api\V1\UserController@store
+  GET|HEAD        api/v1/admin/users/{user} ................ users.show › Api\V1\UserController@show
+  PUT|PATCH       api/v1/admin/users/{user} ............ users.update › Api\V1\UserController@update
+  DELETE          api/v1/admin/users/{user} .......... users.destroy › Api\V1\UserController@destroy
+  GET|HEAD        api/v1/posts ......................................... Api\V1\PostController@index
+  GET|HEAD        api/v1/posts/author/{userId} ................... Api\V1\PostController@getByAuthor
+  GET|HEAD        api/v1/posts/search ................................. Api\V1\PostController@search
+  GET|HEAD        api/v1/posts/{id} ..................................... Api\V1\PostController@show
+  GET|HEAD        api/v1/posts/{id}/comments ..................... Api\V1\PostController@getComments
        
 ```
 
