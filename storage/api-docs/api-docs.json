@@ -1061,42 +1061,6 @@
                 }
             }
         },
-        "/api/documentation": {
-            "get": {
-                "tags": [
-                    "Documentation"
-                ],
-                "summary": "API Documentation",
-                "description": "Fetch the API documentation",
-                "operationId": "getDocumentation",
-                "responses": {
-                    "200": {
-                        "description": "Documentation retrieved successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "status": {
-                                            "type": "integer",
-                                            "example": 200
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Documentation retrieved successfully"
-                                        },
-                                        "data": {
-                                            "type": "object",
-                                            "example": "{...}"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
         "/api/oauth2-callback": {
             "get": {
                 "tags": [
@@ -1150,10 +1114,6 @@
         {
             "name": "Users",
             "description": "Users"
-        },
-        {
-            "name": "Documentation",
-            "description": "Documentation"
         },
         {
             "name": "Deprecated",
