@@ -289,7 +289,6 @@ class PostController extends Controller
         return $post;
     }
 
-
     /**
      * @OA\Put(
      *     path="/api/v1/posts/{id}",
