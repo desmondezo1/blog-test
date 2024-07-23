@@ -263,12 +263,14 @@ class PostController extends Controller
         } catch (ModelNotFoundException $e) {
             return $this->error(
                 'Post not found.',
-                Response::HTTP_NOT_FOUND
+                Response::HTTP_NOT_FOUND,
+                $e->getMessage()
             );
         } catch (\Exception $e) {
             return $this->error(
-                'An error occurred trying to retrieve the post: '. $e->getMessage(),
-                Response::HTTP_INTERNAL_SERVER_ERROR
+                'An error occurred trying to retrieve the post: ',
+                Response::HTTP_INTERNAL_SERVER_ERROR, 
+                $e->getMessage()
             );
         }
     }
