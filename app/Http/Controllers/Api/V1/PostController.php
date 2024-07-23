@@ -181,7 +181,7 @@ class PostController extends Controller
         }
     }
 
-        /**
+    /**
      * @OA\Post(
      *     path="/api/v1/admin/posts",
      *     tags={"Admin"},
@@ -252,10 +252,11 @@ class PostController extends Controller
     /**
      *  Fetch a post.
      */
-    public function show(int $id): JsonResponse
+    public function show(mixed $id): JsonResponse
     {
         try {
-            $post = Post::findOrFail($id);
+           
+            $post = $this->getPostBySlugOrId($id);
             $postResource = new PostResource($post);
 
             return $this->ok('Post fetched', $postResource);
@@ -266,10 +267,24 @@ class PostController extends Controller
             );
         } catch (\Exception $e) {
             return $this->error(
-                'An error occurred trying to retrieve the post.',
+                'An error occurred trying to retrieve the post: '. $e->getMessage(),
                 Response::HTTP_INTERNAL_SERVER_ERROR
             );
         }
+    }
+
+    /**
+     *   Get a post by slug or ID
+     */
+    private function getPostBySlugOrId($slugOrId): Post
+    {
+        if (is_numeric($slugOrId)) {
+            $post = Post::findOrFail($slugOrId);
+            return $post;
+        }
+        
+        $post = Post::where('slug', $slugOrId)->firstOrFail();
+        return $post;
     }
 
 
